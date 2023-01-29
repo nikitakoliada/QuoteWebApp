@@ -1,0 +1,127 @@
+﻿@model PaginatedList<QuotesWebApp.Models.Quote>
+
+@{
+    ViewData["Title"] = "Index";
+}
+
+<h1>Quotes</h1>
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-info ">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].QuoteText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Tags)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model[0].Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuoteText)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tags)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-info ">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info ">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-info ">Delete</a>
+                    <a asp-action="Favourite" asp-route-id="@item.Id" class="btn btn-outline-info ">Favourite</a>
+
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@{
+    var prevDisabled = !Model.HasPreviousPage ? "disabled hidden" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled hidden" : "";
+    var prevPagesDisabled = !Model.HasPreviousPages ? "disabled hidden" : "";
+    var nextPagesDisabled = !Model.HasNextPages ? "disabled hidden" : "";
+}
+
+<a asp-action="Index"
+   asp-route-pageNumber="1"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-primary ">
+    First
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-secondary @prevDisabled visible">
+   Previous
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 2)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevPagesDisabled">
+    @(Model.PageIndex - 2)
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @prevDisabled">
+    @(Model.PageIndex - 1)
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-dark">
+
+    @(Model.PageIndex)
+
+</a>
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default  @nextDisabled">
+    @(Model.PageIndex + 1)
+</a>
+
+<a asp-action="Index"
+       asp-route-pageNumber="@(Model.PageIndex + 2)"
+       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-default @nextPagesDisabled">
+    @(Model.PageIndex + 2)
+</a>
+
+
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-secondary @nextDisabled visible">
+    Next
+</a>
+
+<a asp-action="Index"
+   asp-route-pageNumber="@(Model.TotalPages)"
+   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   class="btn btn-outline-primary">
+    Last
+</a>

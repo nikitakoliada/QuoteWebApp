@@ -1,0 +1,47 @@
+﻿@model QuotesWebApp.Models.Quote
+
+@{
+    ViewData["Title"] = "Details";
+}
+
+<h1>Details about this quote</h1>
+
+<div>
+    <h4>Quote</h4>
+    <hr />
+    <dl class="row">
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.QuoteText)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.QuoteText)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Author)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Author)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Tags)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Tags)
+        </dd>
+        <dt class = "col-sm-2">
+            @Html.DisplayNameFor(model => model.Category)
+        </dt>
+        <dd class = "col-sm-10">
+            @Html.DisplayFor(model => model.Category)
+        </dd>
+    </dl>
+</div>
+<div>
+    <a asp-action="Edit" class="btn btn-primary"asp-route-id="@Model?.Id">Edit</a> 
+    <br />
+    <br />
+
+    <div>
+        <a asp-action="Index" class="btn btn-outline-info">Back to List</a>
+    </div>
+</div>

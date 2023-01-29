@@ -1,0 +1,77 @@
+﻿@model QuotesWebApp.Models.Quote
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>Quote</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="Create">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="QuoteText" class="control-label"></label>
+                <textarea class="form-control" id="exampleFormControlTextarea1" placeholder="Write down the text of the quote" rows="5" asp-for="QuoteText" class="form-control"></textarea>
+                <span asp-validation-for="QuoteText" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Author" class="control-label"></label>
+                <input asp-for="Author" placeholder="Author"type="text" class="form-control" />
+                <span asp-validation-for="Author" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Tags" class="control-label"></label>
+                <input asp-for="Tags" placeholder="Write multiple tags seperated with commas" class="form-control" />
+                <span asp-validation-for="Tags" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Category" class="control-label"></label>
+                <select asp-for="Category" class="form-control" id="exampleFormControlSelect1">
+                    <option>life</option>
+                    <option>mood</option>
+                    <option>history</option>
+                    <option>inspiration</option>
+                    <option>humor</option>
+                    <option>philosophy</option>
+                    <option>science</option>
+                    <option>love</option>
+                    <option>soul</option>
+                    <option>books</option>
+                    <option>truth</option>
+                    <option>wisdom</option>
+                    <option>knowledge</option>
+                    <option>strategy</option>
+                    <option>education</option>
+                    <option>poetry</option>
+                    <option>hope</option>
+                    <option>friendship</option>
+                    <option>fantasy</option>
+                    <option>success</option>
+                    <option>arts</option>
+                    <option>life</option>
+                    <option>death</option>
+                </select>
+                <span asp-validation-for="Category" class="text-danger"></span>
+            </div>
+            <br />
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<br />
+<br />
+<br /> 
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-info">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

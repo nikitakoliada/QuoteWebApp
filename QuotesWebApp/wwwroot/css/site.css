@@ -1,0 +1,33 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn {
+    margin: 5px;
+}
+.quotetext{
+
+}
+
+.hidden {
+    visibility: hidden;
+    display: none;
+}
+.visible {
+    visibility: initial !important;
+    display: initial !important;
+}
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}

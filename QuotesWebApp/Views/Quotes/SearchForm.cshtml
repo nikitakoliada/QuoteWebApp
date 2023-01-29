@@ -1,0 +1,62 @@
+﻿
+<h4>Search quotes</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form asp-action="SearchResults">
+            <div class="form-group">
+                <label for="QuotePhrase" class="control-label">QuotePhrase</label>
+                <textarea name ="QuotePhrase" class="form-control" id="exampleFormControlTextarea1"
+                         placeholder="Write down the text of the quote" rows="5" class="form-control"></textarea>
+            </div>
+            <div class="form-group">
+                <label for="Author"  class="control-label">Author</label>
+                <input name="Author" placeholder="Author" type="text" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Tags"  class="control-label">Tags</label>
+                <input name="Tags" placeholder="Write multiple tags seperated with commas" class="form-control" />
+            </div>
+            <div class="form-group">
+                <label for="Category" placeholder="Category"class="control-label">Category</label>
+                <select name="Category" class="form-control" id="exampleFormControlSelect1">
+                    <option>life</option>
+                    <option>mood</option>
+                    <option>history</option>
+                    <option>inspiration</option>
+                    <option>humor</option>
+                    <option>philosophy</option>
+                    <option>science</option>
+                    <option>love</option>
+                    <option>soul</option>
+                    <option>books</option>
+                    <option>truth</option>
+                    <option>wisdom</option>
+                    <option>knowledge</option>
+                    <option>strategy</option>
+                    <option>education</option>
+                    <option>poetry</option>
+                    <option>hope</option>
+                    <option>friendship</option>
+                    <option>fantasy</option>
+                    <option>success</option>
+                    <option>arts</option>
+                    <option>life</option>
+                    <option>death</option>
+                </select>
+            </div>
+            <br/>
+            <div class="form-group">
+                <input type="submit" value="Search" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<br />
+<br />
+<br /> 
+
+<div>
+    <a asp-action="Index" class="btn btn-outline-info">Back to List</a>
+</div>
