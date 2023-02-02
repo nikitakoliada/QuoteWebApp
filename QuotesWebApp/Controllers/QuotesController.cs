@@ -60,7 +60,7 @@ namespace QuotesWebApp.Controllers
         }
 
         [Authorize]
-        public IActionResult Favourite()
+        public async void Favourite(Quote quote)
         // GET: Quotes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -94,7 +94,6 @@ namespace QuotesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,QuoteText,Author,Tags,Category")] Quote quote)
         {
-            if (ModelState.IsValid)
             {
                 _context.Add(quote);
                 await _context.SaveChangesAsync();
