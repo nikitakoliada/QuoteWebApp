@@ -9,7 +9,25 @@
 <p>
     <a asp-action="Create" class="btn btn-outline-info ">Create New</a>
 </p>
-<table class="table">
+@{
+    string? phrase = (ViewData["currentFilterQuotePhrase"] == "" ) ? "All" : ViewData["currentFilterQuotePhrase"].ToString();
+    string? author = (ViewData["currentFilterAuthor"] == "" ) ? "All" : ViewData["currentFilterAuthor"].ToString();
+    string? tags = (ViewData["currentFilterTags"] == "" ) ? "All" : ViewData["currentFilterTags"].ToString();
+    string? category = (ViewData["currentFilterCategory"] == "") ? "All" : ViewData["currentFilterCategory"].ToString();
+}
+<h3>Your search parameters: </h3>
+<p>Quote phrase: @phrase</p>
+<p>Author: @author</p>
+<p>Tags: @tags</p>
+<p>Category: @category</p>
+   
+<br/>
+
+@if(Model.Count == 0)
+{
+    <p>No Results</p>
+}
+<table class="table table-hover .w-auto">
     <thead>
         <tr>
             <th>
@@ -46,52 +64,68 @@
                     @Html.DisplayFor(modelItem => item.Category)
                 </td>
                 <td>
-                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-info ">Edit</a>
                     <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info ">Details</a>
-                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-info ">Delete</a>
-                    <a asp-action="Favourite" asp-route-id="@item.Id" class="btn btn-outline-info ">Favourite</a>
-
+                    @{
+                        string url = @Url.Action("FavouriteConfirmed", "Quotes");
+                        <button class="btn btn-outline-info " type="button" onClick="postFav('@item.Id', '@url')">Fav</button>
+                    }
                 </td>
             </tr>
         }
     </tbody>
 </table>
+<div id="result"> </div>
 
+@if (Model.TotalPages > 1){
 
-@{
     var prevDisabled = !Model.HasPreviousPage ? "disabled hidden" : "";
     var nextDisabled = !Model.HasNextPage ? "disabled hidden" : "";
     var prevPagesDisabled = !Model.HasPreviousPages ? "disabled hidden" : "";
     var nextPagesDisabled = !Model.HasNextPages ? "disabled hidden" : "";
-}
+
 
 <a asp-action="Index"
    asp-route-pageNumber="1"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-outline-primary ">
     First
 </a>
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-outline-secondary @prevDisabled visible">
    Previous
 </a>
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex - 2)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-default @prevPagesDisabled">
     @(Model.PageIndex - 2)
 </a>
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex - 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-default @prevDisabled">
     @(Model.PageIndex - 1)
 </a>
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-outline-dark">
 
     @(Model.PageIndex)
@@ -99,14 +133,20 @@
 </a>
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-default  @nextDisabled">
     @(Model.PageIndex + 1)
 </a>
 
 <a asp-action="Index"
        asp-route-pageNumber="@(Model.PageIndex + 2)"
-       asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-default @nextPagesDisabled">
     @(Model.PageIndex + 2)
 </a>
@@ -114,14 +154,25 @@
 
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.PageIndex + 1)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-outline-secondary @nextDisabled visible">
     Next
 </a>
 
 <a asp-action="Index"
    asp-route-pageNumber="@(Model.TotalPages)"
-   asp-route-currentFilter="@ViewData["CurrentFilter"]"
+   asp-route-currentFilterQuotePhrase="@ViewData["currentFilterQuotePhrase"]"
+   asp-route-currentFilterAuthor="@ViewData["currentFilterAuthor"]"
+   asp-route-currentFilterTags="@ViewData["currentFilterTags"]"
+   asp-route-currentFilterCategory="@ViewData["currentFilterCategory"]"
    class="btn btn-outline-primary">
     Last
 </a>
+
+   }
+@section scripts{
+    <script src="~/js/site.js"></script>
+}

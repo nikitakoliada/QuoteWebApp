@@ -1,0 +1,152 @@
+﻿@model PaginatedList<QuotesWebApp.Models.Quote>
+
+@{
+    ViewData["Title"] = "Your Quotes";
+}
+
+<h1>Your Quotes</h1>
+
+
+<p>
+    <a asp-action="Create" class="btn btn-outline-info ">Create New</a>
+</p>
+<br/>
+@if (Model.Count == 0)
+{
+    <p>No Results</p>
+}
+<table class="table table-hover w-auto">
+    <thead>
+        <tr>
+            <th>
+                @Html.DisplayNameFor(model => model[0].QuoteText)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Author)
+            </th>
+            <th>
+                @Html.DisplayNameFor(model => model[0].Tags)
+            </th>
+
+            <th>
+                @Html.DisplayNameFor(model => model[0].Category)
+            </th>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model)
+        {
+            <tr>
+                <td>
+                    @Html.DisplayFor(modelItem => item.QuoteText)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Author)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Tags)
+                </td>
+
+                <td>
+                    @Html.DisplayFor(modelItem => item.Category)
+                </td>
+                <td>
+                    <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-outline-info ">Edit</a>
+                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-outline-info ">Details</a>
+                    <a asp-action="Delete" asp-route-id="@item.Id" class="btn btn-outline-info ">Delete</a>
+                    @{
+                        string url = @Url.Action("FavouriteConfirmed", "Quotes");
+                        <button class="btn btn-outline-info " type="button" onClick="postFav('@item.Id', '@url')">Fav</button>
+                    }
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+
+@if (Model.TotalPages > 1)
+{
+
+    var prevDisabled = !Model.HasPreviousPage ? "disabled hidden" : "";
+    var nextDisabled = !Model.HasNextPage ? "disabled hidden" : "";
+    var prevPagesDisabled = !Model.HasPreviousPages ? "disabled hidden" : "";
+    var nextPagesDisabled = !Model.HasNextPages ? "disabled hidden" : "";
+
+
+    <a asp-action="OwnQuotes"
+   asp-route-pageNumber="1"
+
+   class="btn btn-outline-primary ">
+        First
+    </a>
+    <a asp-action="OwnQuotes"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+
+   class="btn btn-outline-secondary @prevDisabled visible">
+        Previous
+    </a>
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.PageIndex - 2)"
+   class="btn btn-default @prevPagesDisabled">
+        @(
+            Model.PageIndex - 2
+            )
+    </a>
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.PageIndex - 1)"
+   class="btn btn-default @prevDisabled">
+        @(
+            Model.PageIndex - 1
+            )
+    </a>
+    <a asp-action="Index"
+   asp-route-pageNumber="@(Model.PageIndex)"
+   class="btn btn-outline-dark">
+
+        @(
+            Model.PageIndex
+            )
+
+    </a>
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-default  @nextDisabled">
+        @(
+            Model.PageIndex + 1
+            )
+    </a>
+
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.PageIndex + 2)"
+
+   class="btn btn-default @nextPagesDisabled">
+        @(
+            Model.PageIndex + 2
+            )
+    </a>
+
+
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.PageIndex + 1)"
+   class="btn btn-outline-secondary @nextDisabled visible">
+        Next
+    </a>
+
+    <a asp-action="Favourite"
+   asp-route-pageNumber="@(Model.TotalPages)"
+   class="btn btn-outline-primary">
+        Last
+    </a>
+}
+<br/>
+<div>
+    <a asp-action="Index"
+       class="btn btn-outline-info">Back to List</a>
+</div>
+
+        @section scripts{
+    <script src="~/js/site.js">        
+    </script>
+        }

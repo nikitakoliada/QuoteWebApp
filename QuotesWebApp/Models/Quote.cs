@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Diagnostics.CodeAnalysis;
 
 namespace QuotesWebApp.Models
 {
@@ -13,7 +14,8 @@ namespace QuotesWebApp.Models
 
         public string Category { get; set; }
 
-
+        //email of a person who created the quote
+        public string? Email { get; set; }
     }
 
 }

@@ -1,4 +1,13 @@
-﻿// Please see documentation at https://docs.microsoft.com/aspnet/core/client-side/bundling-and-minification
-// for details on configuring this project to bundle and minify static web assets.
-
-// Write your JavaScript code.
+﻿function postFav(parameterID, controllerUrl) {
+    $.ajax({
+        type: "POST",
+        dataType: "json",
+        url: String(controllerUrl),
+        data: { id: parameterID },
+        success: function (data) {
+            if (data.success) {
+                alert(data.message);
+            }
+        }
+    });
+}

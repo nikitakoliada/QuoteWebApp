@@ -10,6 +10,8 @@ using QuotesWebApp.Models;
 using PagedList;
 using System.Drawing.Printing;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.VisualBasic;
 
 namespace QuotesWebApp.Controllers
 {
@@ -17,50 +19,178 @@ namespace QuotesWebApp.Controllers
     {
         private readonly ApplicationDbContext _context;
 
-        public QuotesController(ApplicationDbContext context)
+        private readonly UserManager<ApplicationUser> _userManager;
+
+        public QuotesController(ApplicationDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
+            _userManager = userManager;
+
         }
 
-        // GET: Quotes
-        public async Task<IActionResult> Index(string currentFilter, string searchString, int? pagenumber)
+        //GET: Quotes
+        public async Task<IActionResult> Index(
+        string quotePhrase,
+        string author,
+        string tags,
+        string category,
+        string? currentFilterQuotePhrase,
+        string? currentFilterAuthor,
+        string? currentFilterTags,
+        string? currentFilterCategory,
+        int? pageNumber)
         {
-            if (searchString != null)
+
+            if (!String.IsNullOrEmpty(quotePhrase) || !String.IsNullOrEmpty(author) || !String.IsNullOrEmpty(tags) || !String.IsNullOrEmpty(category))
             {
-                pagenumber = 1;
+                pageNumber = 1;
             }
             else
             {
-                searchString = currentFilter;
+
+                quotePhrase = currentFilterQuotePhrase ?? "";
+                author = currentFilterAuthor ?? "";
+                tags = currentFilterTags ?? "";
+                category = currentFilterCategory ?? "";
             }
+
+            quotePhrase = quotePhrase == null ? "" : quotePhrase;
+            author = author == null ? "" : author;
+            tags = tags == null ? "" : tags;
+            category = category == null ? "" : category;
+
+            ViewData["currentFilterQuotePhrase"] = quotePhrase;
+            ViewData["currentFilterAuthor"] = author;
+            ViewData["currentFilterTags"] = tags;
+            ViewData["currentFilterCategory"] = category;
+
             var quotes = from s in _context.Quote
-                           select s;
+                         select s;
+
+
+            if (!String.IsNullOrEmpty(quotePhrase) || !String.IsNullOrEmpty(author) || !String.IsNullOrEmpty(tags) || !String.IsNullOrEmpty(category))
+            {
+                quotes = quotes.Where(j => j.QuoteText.Contains(quotePhrase) && j.Author.Contains(author) && j.Tags.Contains(tags) && j.Category.Contains(category));
+            }
+
             int pageSize = 10;
-            return View(await PaginatedList<Quote>.CreateAsync(quotes.AsNoTracking(), pagenumber ?? 1, pageSize));
-
+            return View(await PaginatedList<Quote>.CreateAsync(quotes.AsNoTracking(), pageNumber ?? 1, pageSize));
         }
-        //int pageNumber = 1)
 
-        //return View(await PagedList<Quote>.CreateAsync(_context.Quote, pageNumber, 20));
+        [Authorize]
+        //GET: Quotes/Favourite
+        public async Task<IActionResult> Favourite(int? pageNumber)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            var userFavQuotes =  from s in _context.UserFavQuotes
+                         select s;
+            userFavQuotes =  userFavQuotes.Where(i => i.UserId == user.Id);
+
+            var quotes = from s in _context.Quote
+                         select s;
+            List<int> idsFavQuotes = new List<int>();
+            foreach (var userFavQuote in userFavQuotes)
+            {
+                idsFavQuotes.Add(userFavQuote.QuoteId);
+            }
+            quotes = quotes.Where(i => idsFavQuotes.Contains(i.Id));
+
+            return View(await PaginatedList<Quote>.CreateAsync(quotes.AsNoTracking(), pageNumber ?? 1, 10));
+        }
+        [Authorize]
+        //GET: Quotes/YourQoutes
+        public async Task<IActionResult> OwnQuotes(int? pageNumber)
+        {
+            var quotes = from s in _context.Quote
+                         select s;
+            var user = await _userManager.GetUserAsync(User);
+
+            quotes = quotes.Where(i => i.Email == user.Email);
+
+            return View(await PaginatedList<Quote>.CreateAsync(quotes.AsNoTracking(), pageNumber ?? 1, 10));
+        }
 
         // GET: Quotes/SearchForm
-        public async Task<IActionResult> SearchForm()
+        public IActionResult SearchForm()
         {
             return View();
         }
         //Post: Quotes/SearchResults
-        public async Task<IActionResult> SearchResults(String QuotePhrase, String Author, String Tags, String Category)
+        public IActionResult SearchResults(
+    string quotePhrase,
+    string author,
+    string tags,
+    string category)
         {
-            var quotes = from j in _context.Quote select j;
 
-            quotes = quotes.Where(j => j.QuoteText.Contains(QuotePhrase) || j.Author.Contains(Author) || j.Tags.Contains(Tags) || j.Category.Contains(Category));
-            int pageSize = 10;
-            int pagenumber = 1;
-            return View("Index", await PaginatedList<Quote>.CreateAsync(quotes.AsNoTracking(), pagenumber, pageSize));
+            return RedirectToAction("Index", new
+            {
+                quotePhrase = quotePhrase,
+                author = author,
+                tags = tags,
+                category = category
+            });
         }
 
         [Authorize]
-        public async void Favourite(Quote quote)
+        [HttpPost]
+        public async Task<IActionResult> FavouriteConfirmed(int id)
+        {
+            if (ModelState.IsValid)
+            {
+                if (id == null || _context.Quote == null)
+                {
+                    return NotFound();
+                }
+
+                Quote quote = await _context.Quote.FirstOrDefaultAsync(m => m.Id == id);
+                if (quote == null)
+                {
+                    return NotFound();
+                }
+                var user = await _userManager.GetUserAsync(User);
+                if (user == null)
+                {
+                    return NotFound();
+                }
+                try
+                {
+                    var userFavQuote = await _context.UserFavQuotes.FirstOrDefaultAsync(m => m.QuoteId == id && m.UserId == user.Id);
+
+                    string msg = "";
+
+                    if (userFavQuote != null)
+                    {
+                        _context.UserFavQuotes.Remove(userFavQuote);
+                        await _context.SaveChangesAsync();
+                        msg = "The quote was removed";
+
+                    }
+                    else
+                    {
+                        userFavQuote = new UserFavQuotes();
+                        userFavQuote.UserId = user.Id;
+                        userFavQuote.QuoteId = quote.Id;
+
+                        _context.UserFavQuotes.Add(userFavQuote);
+                        msg = "The quote was added";
+
+                        //TODO only 
+                    }
+                    await _context.SaveChangesAsync();
+                    return Json(new { success = true, message = msg });
+                }
+                catch
+                {
+                    return Json(new { success = false, message = "An error accured" });
+                }
+
+            }
+            return RedirectToAction(nameof(Index));
+        }
+
+
+
         // GET: Quotes/Details/5
         public async Task<IActionResult> Details(int? id)
         {
@@ -92,19 +222,21 @@ namespace QuotesWebApp.Controllers
         [Authorize]
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,QuoteText,Author,Tags,Category")] Quote quote)
+        public async Task<IActionResult> Create([Bind("Id,QuoteText,Author,Tags,Category, Email")] Quote quote)
         {
-            {
+            if (ModelState.IsValid) {
+                var user = await _userManager.GetUserAsync(User);
+                quote.Email = user.Email;
                 _context.Add(quote);
                 await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(OwnQuotes));
             }
             return View(quote);
-        }
+    }
 
         // GET: Quotes/Edit/5
         [Authorize]
-        public async Task<IActionResult> Edit(int? id)
+        public async Task<IActionResult> Edit( int? id)
         {
             if (id == null || _context.Quote == null)
             {
@@ -127,13 +259,16 @@ namespace QuotesWebApp.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("Id,QuoteText,Author,Tags,Category")] Quote quote)
         {
-            if (id != quote.Id)
-            {
-                return NotFound();
-            }
-
             if (ModelState.IsValid)
             {
+
+                if (id != quote.Id)
+                {
+                    return NotFound();
+                }
+                var user = await _userManager.GetUserAsync(User);
+                quote.Email = user.Email;
+
                 try
                 {
                     _context.Update(quote);
@@ -150,7 +285,7 @@ namespace QuotesWebApp.Controllers
                         throw;
                     }
                 }
-                return RedirectToAction(nameof(Index));
+                return RedirectToAction(nameof(OwnQuotes));
             }
             return View(quote);
         }
@@ -191,7 +326,7 @@ namespace QuotesWebApp.Controllers
             }
             
             await _context.SaveChangesAsync();
-            return RedirectToAction(nameof(Index));
+            return RedirectToAction(nameof(OwnQuotes));
         }
 
         private bool QuoteExists(int id)
